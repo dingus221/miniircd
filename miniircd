@@ -39,7 +39,8 @@ from ctypes import *
 gn_gk = {'civ4':        'y3D9Hw',
          'civ4bts':     'Cs2iIq',
          'civ4btsjp':   'Cs2iIq',
-         'gmtest':      'HA6zkS'}
+         'gmtest':      'HA6zkS',
+         'gslive':      'Xn221z'}
 
 
 # Based on http://aluigi.altervista.org/papers.htm#peerchat
@@ -192,8 +193,8 @@ class Client(object):
     def __parse_read_buffer(self):
         #DECODING DATA
         #if client doesn't have gamename set then he doesnt need encoding
-        if self.gamename is not None:
-            self.__readbuffer = self.inCrypt.call(self.__readbuffer)
+        if self.gamename is not None and self.in_crypt is not None:
+            self.__readbuffer = self.in_crypt(self.__readbuffer)
             #print "data decoded:",self.__readbuffer
 
         lines = self.__linesep_regexp.split(self.__readbuffer)
@@ -259,8 +260,8 @@ class Client(object):
             self.message(":s 705 * {} {}".format("0" * 16, "0" * 16))
             self.gamename = arguments[2]
             try:
-                self.in_crypt = GsPeerchat(gn_gk[self.gamename])
-                self.out_crypt = GsPeerchat(gn_gk[self.gamename])
+                self.in_crypt = GsPeerchat(gamekey=gn_gk[self.gamename])
+                self.out_crypt = GsPeerchat(gamekey=gn_gk[self.gamename])
             except KeyError:
                 print('Unknown game "{}" requestesd'.format(self.gamename))
         elif command == "USRIP":
@@ -705,9 +706,9 @@ class Client(object):
 
     def message(self, msg):
         msg += "\r\n"
-        if self.gamename is not None:
+        if self.gamename is not None and self.out_crypt is not None:
             #print "Original msg"+msg
-            msg = self.outCrypt.call(msg)
+            msg = self.out_crypt(msg)
             #print "Ecoded msg"+msg
         self.__writebuffer += msg
 
