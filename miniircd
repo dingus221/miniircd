@@ -666,7 +666,7 @@ class Client(object):
             "JOIN": join_handler,
             "LIST": list_handler,
             "LUSERS": lusers_handler,
-            "MODE": mode_handler,
+            #"MODE": mode_handler, let's random irc users block people from joining by doing "/mode +k lala" on #GSP!civ4bts
             "MOTD": motd_handler,
             "NICK": nick_handler,
             "NOTICE": notice_and_privmsg_handler,
